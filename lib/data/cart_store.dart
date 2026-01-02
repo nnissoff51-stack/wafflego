@@ -1,18 +1,40 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+
+class OrderItem {
+  final String name;
+  final int quantity;
+  final double price;
+  final List<String> toppings;
+  final String? mix;
+
+  OrderItem({
+    required this.name,
+    required this.quantity,
+    required this.price,
+    this.toppings = const [],
+    this.mix,
+  });
+}
 
 class CartStore extends ChangeNotifier {
-  final List<Map<String, dynamic>> _items = [];
+  final List<OrderItem> _currentCart = [];
+  final List<List<OrderItem>> _history = [];
 
-  List<Map<String, dynamic>> get items => _items;
+  List<OrderItem> get currentCart => List.unmodifiable(_currentCart);
+  List<List<OrderItem>> get history => List.unmodifiable(_history);
 
-  void add(Map<String, dynamic> item) {
-    _items.add(item);
+  void addToCart(OrderItem item) {
+    _currentCart.add(item);
     notifyListeners();
   }
 
-  void clear() {
-    _items.clear();
+  void checkout() {
+    if (_currentCart.isEmpty) return;
+    _history.add(List<OrderItem>.from(_currentCart));
+    _currentCart.clear();
     notifyListeners();
   }
+
+  double get totalPrice =>
+      _currentCart.fold(0.0, (sum, item) => sum + item.price * item.quantity);
 }
