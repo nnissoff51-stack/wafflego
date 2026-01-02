@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Buyer App",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "Dashboard 1",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/dashboard_1.dart"
+        },
+        {
+            "name": "Dashboard 2",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/dashboard_2.dart"
+        },
+        {
+            "name": "Stock Screen",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/stock.dart"
+        }
+    ]
+}

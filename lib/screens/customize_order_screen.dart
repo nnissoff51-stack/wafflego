@@ -32,8 +32,12 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
     if (newQty < 1) return;
     setState(() {
       qty = newQty;
-      while (units.length < qty) units.add(_UnitConfig());
-      while (units.length > qty) units.removeLast();
+      while (units.length < qty) {
+        units.add(_UnitConfig());
+      }
+      while (units.length > qty) {
+        units.removeLast();
+      }
     });
   }
 
