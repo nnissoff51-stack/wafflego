@@ -229,7 +229,6 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
               ),
             ),
 
-            // ✅ fixed bottom bar (tak lari)
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               decoration: const BoxDecoration(color: Colors.white),
