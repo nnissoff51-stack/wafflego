@@ -5,10 +5,25 @@ class OrderItem {
   final String name;
   final int quantity;
   final double price;
+  final List<String> toppings;
+  final String? mix;
 
-  OrderItem({required this.name, required this.quantity, required this.price});
+  OrderItem({
+    required this.name,
+    required this.quantity,
+    required this.price,
+    this.toppings = const [],
+    this.mix,
+  });
+
+  double get total => price * quantity;
+
+  String get summary {
+    final t = toppings.isEmpty ? "-" : toppings.join(", ");
+    final m = mix ?? "-";
+    return "Topping: $t | Mix: $m";
+  }
 }
-
 // Store untuk cart + history
 class OrderStore extends ChangeNotifier {
   // Current cart

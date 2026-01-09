@@ -14,7 +14,16 @@ class OrderItem {
     this.toppings = const [],
     this.mix,
   });
+
+  double get total => price * quantity;
+
+  String get summary {
+    final t = toppings.isEmpty ? "-" : toppings.join(", ");
+    final m = mix ?? "-";
+    return "Topping: $t | Mix: $m";
+  }
 }
+
 
 class CartStore extends ChangeNotifier {
   final List<OrderItem> _currentCart = [];
