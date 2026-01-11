@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'screens/buyer/main_shell.dart';
 import 'package:provider/provider.dart';
-import 'package:wafflego/screens/buyer/main_shell.dart';
-
 
 void main() => runApp(const WaffleApp());
 
 class WaffleApp extends StatelessWidget {
   const WaffleApp({super.key});
 
-  @override
  @override
 Widget build(BuildContext context) {
   return MultiProvider(

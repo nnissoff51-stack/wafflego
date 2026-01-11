@@ -18,167 +18,34 @@ class SellerStockScreen extends StatefulWidget {
 }
 
 class _SellerStockScreenState extends State<SellerStockScreen> {
-  late Map<String, bool> availabilityMap;
-
-  // Waffle Data List
-  final List<Map<String, dynamic>> waffles = [
-    {
-      "name": "Chocolate",
-      "desc": "Classic chocolate drizzle.",
-      "price": 4.50,
-      "available": true,
-      "image": "assets/images/chocolate.png",
-    },
-    {
-      "name": "Blueberry",
-      "desc": "Bursting with tangy sweetness.",
-      "price": 4.50,
-      "available": true,
-      "image": "assets/images/blueberry.png",
-    },
-    {
-      "name": "Kaya",
-      "desc": "Authentic Malaysian kaya with smooth, creamy, and fragrant goodness.",
-      "price": 4.50,
-      "available": true,
-      "image": "assets/images/kaya.png",
-    },
-    {
-      "name": "Butter",
-      "desc": "Rich, creamy butter melted to golden perfection.",
-      "price": 4.50,
-      "available": true,
-      "image": "assets/images/butter.png",
-    },
-    {
-      "name": "Strawberry",
-      "desc": "Sweet strawberry topping.",
-      "price": 4.50,
-      "available": false,
-      "image": "assets/images/strawberry.png",
-    },
-    {
-      "name": "Peanut",
-      "desc": "Peanut butter flavour.",
-      "price": 4.50,
-      "available": true,
-      "image": "assets/images/peanut.png",
-    },
+  // Data dummy topping
+  final List<Map<String, dynamic>> _toppings = [
+    {'name': 'Chocolate', 'desc': 'Classic chocolate drizzle.', 'price': 4.50, 'image': 'chocolate.png'},
+    {'name': 'Blueberry', 'desc': 'Bursting with tangy sweetness.', 'price': 4.50, 'image': 'blueberry.png'},
+    {'name': 'Kaya', 'desc': 'Authentic Malaysian kaya...', 'price': 4.50, 'image': 'kaya.png'},
+    {'name': 'Butter', 'desc': 'Rich, creamy butter melted...', 'price': 4.50, 'image': 'butter.png'},
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    availabilityMap = {for (var item in waffles) item['name']: item['available']};
-  }
+  final Map<String, bool> _stockStatus = {
+    'Chocolate': true,
+    'Blueberry': true,
+    'Kaya': true,
+    'Butter': true,
+  };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF4D6),
+      backgroundColor: const Color(0xFFFFF3CC),
       body: SafeArea(
         child: Column(
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Image.asset(
-                    'assets/images/wafflego_logo.png',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.brown[400],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.store, color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text('Welcome, ', style: TextStyle(fontSize: 16)),
-                  Text(
-                    '${widget.currentUser.fullName.split(' ')[0]}!',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFFF6B6B),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  _buildHeaderIcon(Icons.notifications_none),
-                  const SizedBox(width: 8),
-                  _buildHeaderIcon(Icons.person, isProfile: true),
-                ],
-              ),
-            ),
-
-            // Shop Status Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  const Text('SHOP STATUS', style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(width: 12),
-                  _buildStatusBadge(),
-                  const SizedBox(width: 8),
-                  _buildToggleSwitch(),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Section Banner
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFB84D),
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: const Center(
-                  child: Text(
-                    'TOPPINGS AVAILABILITY',
-                    style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            // Table Headers - ALIGNED WITH RADIO BUTTONS
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: const [
-                  SizedBox(width: 67), // Space for image
-                  Expanded(child: SizedBox()), // Space for name and description
-                  Text('Available', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  SizedBox(width: 30),
-                  Text('Out of stock', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  SizedBox(width: 8),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            // Toppings List
+            _buildHeader(),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                itemCount: waffles.length,
-                itemBuilder: (context, index) {
-                  return _buildToppingCard(waffles[index]);
-                },
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: _toppings.length,
+                itemBuilder: (context, index) => _buildStockItem(_toppings[index]),
               ),
             ),
           ],
@@ -187,29 +54,101 @@ class _SellerStockScreenState extends State<SellerStockScreen> {
     );
   }
 
-  Widget _buildToppingCard(Map<String, dynamic> item) {
-    String name = item['name'];
-    bool isAvailable = availabilityMap[name] ?? false;
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: widget.isShopOpen ? Colors.green.shade100 : Colors.red.shade100,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Row(
+              children: [
+                Text(
+                  "SHOP STATUS: ${widget.isShopOpen ? 'OPEN' : 'CLOSED'}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: widget.isShopOpen ? Colors.green.shade900 : Colors.red.shade900,
+                  ),
+                ),
+                const Spacer(),
+                Switch(
+                  value: widget.isShopOpen,
+                  onChanged: (val) => widget.onToggleShopStatus(),
+                  activeColor: Colors.green,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFB74D),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Center(
+              child: Text(
+                "TOPPINGS AVAILABILITY",
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 10, right: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text("Available", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                SizedBox(width: 25),
+                Text("Out of stock", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStockItem(Map<String, dynamic> topping) {
+    String name = topping['name'];
+    bool isAvailable = _stockStatus[name] ?? true;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFFDAA3), width: 2),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              item['image'],
-              width: 55,
-              height: 55,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stack) => Container(
-                width: 55, height: 55, color: Colors.orange[50], child: const Icon(Icons.fastfood),
+            borderRadius: BorderRadius.circular(15),
+            child: ColorFiltered(
+              colorFilter: isAvailable
+                  ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
+                  : const ColorFilter.matrix(<double>[
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0.2126, 0.7152, 0.0722, 0, 0,
+                      0, 0, 0, 1, 0,
+                    ]),
+              child: Image.asset(
+                'assets/images/${topping['image']}',
+                width: 70, height: 70, fit: BoxFit.cover,
+                errorBuilder: (context, error, stack) => const Icon(Icons.fastfood, size: 70, color: Colors.grey),
               ),
             ),
           ),
@@ -218,86 +157,26 @@ class _SellerStockScreenState extends State<SellerStockScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                Text(
-                  item['desc'],
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'RM ${item['price'].toStringAsFixed(2)}',
-                  style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 13),
-                ),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(topping['desc'], style: const TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1),
+                Text("RM ${topping['price'].toStringAsFixed(2)}", style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
-          _buildCustomRadio(true, isAvailable, () => setState(() => availabilityMap[name] = true)),
-          const SizedBox(width: 50),
-          _buildCustomRadio(false, !isAvailable, () => setState(() => availabilityMap[name] = false)),
-          const SizedBox(width: 8),
+          Radio<bool>(
+            value: true,
+            groupValue: isAvailable,
+            activeColor: Colors.green,
+            onChanged: (val) => setState(() => _stockStatus[name] = true),
+          ),
+          Radio<bool>(
+            value: false,
+            groupValue: isAvailable,
+            activeColor: Colors.red,
+            onChanged: (val) => setState(() => _stockStatus[name] = false),
+          ),
         ],
       ),
     );
   }
-
-  Widget _buildHeaderIcon(IconData icon, {bool isProfile = false}) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: isProfile ? Colors.grey[300] : Colors.white,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, size: 20),
-    );
-  }
-
-  Widget _buildStatusBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: widget.isShopOpen ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        widget.isShopOpen ? 'OPEN' : 'CLOSED',
-        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildToggleSwitch() {
-    return GestureDetector(
-      onTap: widget.onToggleShopStatus,
-      child: Container(
-        width: 44, height: 24,
-        decoration: BoxDecoration(
-          color: widget.isShopOpen ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: AnimatedAlign(
-          duration: const Duration(milliseconds: 200),
-          alignment: widget.isShopOpen ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(width: 20, height: 20, margin: const EdgeInsets.all(2), decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle)),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCustomRadio(bool isGreen, bool isSelected, VoidCallback onTap) {
-    Color color = isGreen ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 24, height: 24,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: color, width: 2),
-          color: isSelected ? color : Colors.transparent,
-        ),
-        child: isSelected ? const Icon(Icons.circle, size: 12, color: Colors.white) : null,
-      ),
-    );
-  }
-}
+} 

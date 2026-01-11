@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/user.dart';
-import 'seller_dashboard_one.dart';
-import 'seller_dashboard_two.dart';
 
-class SellerHomeScreen extends StatefulWidget {
+class SellerHomeScreen extends StatelessWidget {
   final UserModel currentUser;
   final bool isShopOpen;
   final VoidCallback onToggleShopStatus;
@@ -16,184 +14,91 @@ class SellerHomeScreen extends StatefulWidget {
   });
 
   @override
-  State<SellerHomeScreen> createState() => _SellerHomeScreenState();
-}
-
-class _SellerHomeScreenState extends State<SellerHomeScreen> {
-  int _selectedTab = 0; // 0 for Today Sales, 1 for Weekly Sales
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF4D6),
+      backgroundColor: const Color(0xFFFFF3CC),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header: Logo, Welcome Message, and Icons
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.asset(
-                    'assets/images/wafflego_logo.png',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.brown,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(Icons.store, color: Colors.white),
-                      );
-                    },
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Hello, ${currentUser.fullName}!", 
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      const Text("Let's sell some waffles!"),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  const Text('Welcome, ', style: TextStyle(fontSize: 16)),
-                  Text(
-                    '${widget.currentUser.fullName.split(' ')[0]}!',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFFF6B6B),
-                      fontWeight: FontWeight.w500,
-                    ),
+                  const CircleAvatar(
+                    backgroundColor: Colors.orange, 
+                    child: Icon(Icons.person, color: Colors.white)
                   ),
-                  const Spacer(),
-                  _buildHeaderIcon(Icons.notifications),
-                  const SizedBox(width: 8),
-                  _buildHeaderIcon(Icons.person, isProfile: true),
                 ],
               ),
-            ),
+              const SizedBox(height: 25),
 
-            // Shop Status Row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  const Text(
-                    'SHOP STATUS',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(width: 12),
-                  _buildStatusLabel(),
-                  const SizedBox(width: 8),
-                  _buildToggleButton(),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Tab Switcher
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
+              // Consistent Shop Status Card (English)
+              Container(
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFB84D),
-                  borderRadius: BorderRadius.circular(25),
+                  color: isShopOpen ? Colors.green.shade100 : Colors.red.shade100,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
-                    _buildTabItem(0, 'Today Sales'),
-                    _buildTabItem(1, 'Weekly Sales'),
+                    Icon(isShopOpen ? Icons.store : Icons.store_mall_directory, 
+                         color: isShopOpen ? Colors.green : Colors.red, size: 40),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Text(
+                        isShopOpen ? "SHOP STATUS: OPEN" : "SHOP STATUS: CLOSED",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          color: isShopOpen ? Colors.green.shade900 : Colors.red.shade900
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      value: isShopOpen, 
+                      onChanged: (_) => onToggleShopStatus(),
+                      activeColor: Colors.green,
+                    ),
                   ],
                 ),
               ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Dynamic Dashboard Content
-            Expanded(
-              child: _selectedTab == 0
-                  ? SellerDashboardOne(
-                      currentUser: widget.currentUser,
-                      isShopOpen: widget.isShopOpen,
-                    )
-                  : SellerDashboardTwo(
-                      currentUser: widget.currentUser,
-                      isShopOpen: widget.isShopOpen,
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderIcon(IconData icon, {bool isProfile = false}) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: isProfile ? Colors.grey[300] : Colors.white,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(icon, size: 20),
-    );
-  }
-
-  Widget _buildStatusLabel() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: widget.isShopOpen ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        widget.isShopOpen ? 'OPEN' : 'CLOSED',
-        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildToggleButton() {
-    return GestureDetector(
-      onTap: widget.onToggleShopStatus,
-      child: Container(
-        width: 44,
-        height: 24,
-        decoration: BoxDecoration(
-          color: widget.isShopOpen ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: AnimatedAlign(
-          duration: const Duration(milliseconds: 200),
-          alignment: widget.isShopOpen ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            width: 20,
-            height: 20,
-            margin: const EdgeInsets.all(2),
-            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabItem(int index, String label) {
-    bool isSelected = _selectedTab == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedTab = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFFFF8C00) : Colors.transparent,
-            borderRadius: BorderRadius.circular(25),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 25),
+              const Text("Today's Summary", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  _buildStatCard("Orders", "25", Colors.blue),
+                  const SizedBox(width: 15),
+                  _buildStatCard("Sales", "RM 450", Colors.orange),
+                ],
               ),
-            ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+        child: Column(
+          children: [
+            Text(title, style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 10),
+            Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color)),
+          ],
         ),
       ),
     );

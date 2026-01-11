@@ -1,59 +1,52 @@
 class ActivityLogModel {
-  final String? id; // UUID from Supabase
+  final int? id;
+  final String action;
   final String staffName;
-  final String orderId;
-  final String action; // e.g., 'Order Created', 'Order Completed', 'Stock Updated'
-  final DateTime timestamp;
+  final String? orderId;
   final String? details;
+  final DateTime createdAt;
 
   ActivityLogModel({
     this.id,
-    required this.staffName,
-    required this.orderId,
     required this.action,
-    DateTime? timestamp,
+    required this.staffName,
+    this.orderId,
     this.details,
-  }) : timestamp = timestamp ?? DateTime.now();
+    required this.createdAt,
+  });
 
-  // Convert to Map for Supabase
-  Map<String, dynamic> toMap() {
-    return {
-      if (id != null) 'id': id,
-      'staff_name': staffName,
-      'order_id': orderId,
-      'action': action,
-      'timestamp': timestamp.toIso8601String(),
-      'details': details,
-    };
-  }
-
-  // Create from Map
+  /// Factory constructor to create ActivityLogModel from Supabase map
   factory ActivityLogModel.fromMap(Map<String, dynamic> map) {
     return ActivityLogModel(
       id: map['id'],
+      action: map['action'],
       staffName: map['staff_name'],
       orderId: map['order_id'],
-      action: map['action'],
-      timestamp: DateTime.parse(map['timestamp']),
       details: map['details'],
+      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
-  // Formatted timestamp for display
-  String get formattedTime {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
+  /// Convert ActivityLogModel to a map for Supabase insert/update
+  Map<String, dynamic> toMap() {
+    return {
+      if (id != null) 'id': id,
+      'action': action,
+      'staff_name': staffName,
+      'order_id': orderId,
+      'details': details,
+      'created_at': createdAt.toIso8601String(),
+    };
+  }
 
-    if (difference.inMinutes < 1) {
-      return 'Just now';
-    } else if (difference.inHours < 1) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inDays < 1) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else {
-      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
-    }
+  /// ✅ Getter to format the createdAt for UI display
+  String get formattedTime {
+    // Example format: "11/01/2026 14:35"
+    final day = createdAt.day.toString().padLeft(2, '0');
+    final month = createdAt.month.toString().padLeft(2, '0');
+    final year = createdAt.year;
+    final hour = createdAt.hour.toString().padLeft(2, '0');
+    final minute = createdAt.minute.toString().padLeft(2, '0');
+    return '$day/$month/$year $hour:$minute';
   }
 }

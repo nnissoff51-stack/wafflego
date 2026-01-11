@@ -1,35 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'screens/seller/login_screen.dart';
+// Pastikan path ke choose_screen ni betul ikut susunan folder kau
+import 'screens/shared/choose_screen.dart'; 
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Supabase
-  await Supabase.initialize(
-    url: 'YOUR_SUPABASE_URL', // Replace with your URL
-    anonKey: 'YOUR_SUPABASE_ANON_KEY', // Replace with your anon key
-  );
-  
-  runApp(const WaffleGoSellerApp());
+void main() {
+  runApp(const MyApp());
 }
 
-// Global Supabase client
-final supabase = Supabase.instance.client;
-
-class WaffleGoSellerApp extends StatelessWidget {
-  const WaffleGoSellerApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WaffleGo Seller',
+      title: 'Waffle Go Management',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // Guna warna oren sebagai tema utama Waffle Go
         primarySwatch: Colors.orange,
-        fontFamily: 'Roboto',
+        useMaterial3: true,
+        // Set font atau gaya button secara global jika perlu
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange,
+            foregroundColor: Colors.white,
+          ),
+        ),
       ),
-      home: const LoginScreen(),
+      // Kita hantar terus ke ChooseScreen sebagai pintu masuk utama
+      home: const ChooseScreen(),
     );
   }
 }

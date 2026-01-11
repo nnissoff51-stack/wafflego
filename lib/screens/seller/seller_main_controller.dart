@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/user.dart';
 import 'seller_home_screen.dart';
 import 'seller_stock_screen.dart';
+import 'orders_page.dart'; 
 import '../shared/activity_logs_screen.dart';
 
 class SellerMainController extends StatefulWidget {
@@ -20,7 +21,7 @@ class _SellerMainControllerState extends State<SellerMainController> {
   int _currentIndex = 0;
   bool _isShopOpen = true;
 
-  void toggleShopStatus() {
+  void _toggleShopStatus() {
     setState(() {
       _isShopOpen = !_isShopOpen;
     });
@@ -28,24 +29,28 @@ class _SellerMainControllerState extends State<SellerMainController> {
 
   @override
   Widget build(BuildContext context) {
+    // List skrin ikut turutan Tab
+    final List<Widget> _pages = [
+      SellerHomeScreen(
+        currentUser: widget.currentUser,
+        isShopOpen: _isShopOpen,
+        onToggleShopStatus: _toggleShopStatus,
+      ),
+      const OrderPage(), // Tab ke-2
+      SellerStockScreen(
+        currentUser: widget.currentUser,
+        isShopOpen: _isShopOpen,
+        onToggleShopStatus: _toggleShopStatus,
+      ),
+      ActivityLogsScreen(
+        currentUser: widget.currentUser,
+      ),
+    ];
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: [
-          SellerHomeScreen(
-            currentUser: widget.currentUser,
-            isShopOpen: _isShopOpen,
-            onToggleShopStatus: toggleShopStatus,
-          ),
-          SellerStockScreen(
-            currentUser: widget.currentUser,
-            isShopOpen: _isShopOpen,
-            onToggleShopStatus: toggleShopStatus,
-          ),
-          ActivityLogsScreen(
-            currentUser: widget.currentUser,
-          ),
-        ],
+        children: _pages,
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -53,13 +58,12 @@ class _SellerMainControllerState extends State<SellerMainController> {
 
   Widget _buildBottomNavigationBar() {
     return Container(
-      height: 70,
+      height: 75,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
-            spreadRadius: 0,
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -69,8 +73,9 @@ class _SellerMainControllerState extends State<SellerMainController> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(Icons.home_outlined, Icons.home, 'Home', 0),
-          _buildNavItem(Icons.inventory_2_outlined, Icons.inventory_2, 'Stock', 1),
-          _buildNavItem(Icons.history, Icons.history, 'Activity', 2),
+          _buildNavItem(Icons.receipt_long_outlined, Icons.receipt_long, 'Orders', 1),
+          _buildNavItem(Icons.inventory_2_outlined, Icons.inventory_2, 'Stock', 2),
+          _buildNavItem(Icons.history, Icons.history, 'Activity', 3),
         ],
       ),
     );
@@ -80,20 +85,21 @@ class _SellerMainControllerState extends State<SellerMainController> {
     bool isActive = _currentIndex == index;
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
+      behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             isActive ? activeIcon : inactiveIcon,
-            color: isActive ? const Color(0xFFFF8C00) : Colors.grey,
-            size: 26,
+            color: isActive ? Colors.orange : Colors.grey,
+            size: 28,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
-              color: isActive ? const Color(0xFFFF8C00) : Colors.grey,
+              color: isActive ? Colors.orange : Colors.grey,
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
             ),
           ),

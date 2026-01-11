@@ -1,11 +1,10 @@
 class UserModel {
-  final String? id; // UUID from Supabase
+  final int? id; // Nullable because new users may not have an ID yet
   final String username;
   final String password;
   final String fullName;
   final String email;
-  final String role; // 'owner' or 'staff'
-  final DateTime createdAt;
+  final String role; // e.g., 'owner', 'staff'
   final bool isActive;
 
   UserModel({
@@ -15,11 +14,23 @@ class UserModel {
     required this.fullName,
     required this.email,
     required this.role,
-    DateTime? createdAt,
     this.isActive = true,
-  }) : createdAt = createdAt ?? DateTime.now();
+  });
 
-  // Convert UserModel to Map for Supabase
+  /// Create UserModel from a Supabase row (Map)
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      id: map['id'], // Must match your Supabase table column
+      username: map['username'],
+      password: map['password'],
+      fullName: map['full_name'] ?? map['fullName'] ?? '',
+      email: map['email'] ?? '',
+      role: map['role'] ?? 'staff',
+      isActive: map['is_active'] ?? true,
+    );
+  }
+
+  /// Convert UserModel to Map for inserting/updating Supabase
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id,
@@ -28,34 +39,18 @@ class UserModel {
       'full_name': fullName,
       'email': email,
       'role': role,
-      'created_at': createdAt.toIso8601String(),
       'is_active': isActive,
     };
   }
 
-  // Create UserModel from Map (Supabase query result)
-  factory UserModel.fromMap(Map<String, dynamic> map) {
-    return UserModel(
-      id: map['id'],
-      username: map['username'],
-      password: map['password'],
-      fullName: map['full_name'],
-      email: map['email'],
-      role: map['role'],
-      createdAt: DateTime.parse(map['created_at']),
-      isActive: map['is_active'] ?? true,
-    );
-  }
-
-  // Copy with method for updates
+  /// Create a copy of the user with updated fields
   UserModel copyWith({
-    String? id,
+    int? id,
     String? username,
     String? password,
     String? fullName,
     String? email,
     String? role,
-    DateTime? createdAt,
     bool? isActive,
   }) {
     return UserModel(
@@ -65,11 +60,7 @@ class UserModel {
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       role: role ?? this.role,
-      createdAt: createdAt ?? this.createdAt,
       isActive: isActive ?? this.isActive,
     );
   }
-
-  bool get isOwner => role == 'owner';
-  bool get isStaff => role == 'staff';
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/user.dart';
-import '../../models/activity_log.dart';
-import '../../database/supabase_helper.dart';
+import 'choose_screen.dart'; // Import skrin mula
 
 class ActivityLogsScreen extends StatefulWidget {
   final UserModel currentUser;
@@ -16,278 +15,62 @@ class ActivityLogsScreen extends StatefulWidget {
 }
 
 class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
-  List<ActivityLogModel> _logs = [];
-  bool _isLoading = true;
-  String _filterOption = 'all'; // 'all', 'today', 'week'
-
-  @override
-  void initState() {
-    super.initState();
-    _loadLogs();
-  }
-
-  Future<void> _loadLogs() async {
-    setState(() => _isLoading = true);
-
-    try {
-      List<ActivityLogModel> logs;
-      if (_filterOption == 'today') {
-        logs = await SupabaseHelper.instance.getTodayActivityLogs();
-      } else if (_filterOption == 'week') {
-        final now = DateTime.now();
-        final weekAgo = now.subtract(const Duration(days: 7));
-        logs = await SupabaseHelper.instance.getActivityLogsByDateRange(weekAgo, now);
-      } else {
-        logs = await SupabaseHelper.instance.getAllActivityLogs();
-      }
-
-      setState(() {
-        _logs = logs;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading logs: $e')),
-        );
-      }
-    }
+  
+  // Fungsi Logout
+  void _logout(BuildContext context) {
+    // Navigator ni akan buang semua skrin lama dan balik ke ChooseScreen
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const ChooseScreen()),
+      (route) => false, // Ini yang buat user tak boleh tekan 'Back' masuk balik
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF4D6),
-      body: SafeArea(
+      appBar: AppBar(
+        title: const Text('Activity Logs'),
+        backgroundColor: widget.currentUser.role == 'owner' 
+            ? const Color(0xFF8B4513) 
+            : const Color(0xFFFF8C00),
+        foregroundColor: Colors.white,
+        actions: [
+          // Butang Logout kat hujung App Bar
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _showLogoutDialog(context),
+          ),
+        ],
+      ),
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Image.asset(
-                    'assets/images/wafflego_logo.png',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.brown[400],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.store, color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Activity Logs',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Logged in as: ${widget.currentUser.fullName}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: _loadLogs,
-                  ),
-                ],
-              ),
-            ),
-
-            // Filter Options
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                children: [
-                  _buildFilterChip('All', 'all'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('Today', 'today'),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('This Week', 'week'),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Logs List
-            Expanded(
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _logs.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.history,
-                                size: 64,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No activity logs yet',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _logs.length,
-                          itemBuilder: (context, index) {
-                            return _buildLogCard(_logs[index]);
-                          },
-                        ),
-            ),
+            Text('Logged in as: ${widget.currentUser.fullName}'),
+            const SizedBox(height: 20),
+            const Text('Activity history will appear here.'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildFilterChip(String label, String value) {
-    final isSelected = _filterOption == value;
-    return GestureDetector(
-      onTap: () {
-        setState(() => _filterOption = value);
-        _loadLogs();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFF8C00) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? const Color(0xFFFF8C00) : Colors.grey[300]!,
+  // Dialog pengesahan sebelum logout
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 12,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogCard(ActivityLogModel log) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Icon
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFEFD5),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(
-              Icons.receipt_long,
-              color: Color(0xFFFF8C00),
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      log.action,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
-                      log.formattedTime,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Order ID: ${log.orderId}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    const Icon(Icons.person, size: 12, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Handled by: ${log.staffName}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFFFF8C00),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                if (log.details != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    log.details!,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ],
-            ),
+          TextButton(
+            onPressed: () => _logout(context),
+            child: const Text('Logout', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
