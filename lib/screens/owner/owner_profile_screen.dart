@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/user.dart';
 import '../../database/database_helper.dart';
-import '../login_screen.dart';
+import '../seller/login_seller.dart';
 
 class OwnerProfileScreen extends StatefulWidget {
   final User currentUser;
@@ -363,10 +363,10 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
 
     if (confirm == true && mounted) {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (context) => const LoginStaffScreen()),
         (route) => false,
       );
-    }
+    } 
   }
 }
 
