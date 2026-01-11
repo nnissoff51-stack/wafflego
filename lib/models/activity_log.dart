@@ -1,12 +1,12 @@
-class ActivityLog {
-  final int? id;
+class ActivityLogModel {
+  final String? id; // UUID from Supabase
   final String staffName;
   final String orderId;
   final String action; // e.g., 'Order Created', 'Order Completed', 'Stock Updated'
   final DateTime timestamp;
   final String? details;
 
-  ActivityLog({
+  ActivityLogModel({
     this.id,
     required this.staffName,
     required this.orderId,
@@ -15,12 +15,12 @@ class ActivityLog {
     this.details,
   }) : timestamp = timestamp ?? DateTime.now();
 
-  // Convert to Map for database
+  // Convert to Map for Supabase
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'staffName': staffName,
-      'orderId': orderId,
+      if (id != null) 'id': id,
+      'staff_name': staffName,
+      'order_id': orderId,
       'action': action,
       'timestamp': timestamp.toIso8601String(),
       'details': details,
@@ -28,11 +28,11 @@ class ActivityLog {
   }
 
   // Create from Map
-  factory ActivityLog.fromMap(Map<String, dynamic> map) {
-    return ActivityLog(
+  factory ActivityLogModel.fromMap(Map<String, dynamic> map) {
+    return ActivityLogModel(
       id: map['id'],
-      staffName: map['staffName'],
-      orderId: map['orderId'],
+      staffName: map['staff_name'],
+      orderId: map['order_id'],
       action: map['action'],
       timestamp: DateTime.parse(map['timestamp']),
       details: map['details'],

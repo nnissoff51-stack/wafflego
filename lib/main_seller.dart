@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:wafflego/models/user.dart';
-import 'screens/seller/seller_home_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'screens/seller/login_screen.dart';
 
-void main() => runApp(const WaffleGoSellerApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: 'YOUR_SUPABASE_URL', // Replace with your URL
+    anonKey: 'YOUR_SUPABASE_ANON_KEY', // Replace with your anon key
+  );
+  
+  runApp(const WaffleGoSellerApp());
+}
+
+// Global Supabase client
+final supabase = Supabase.instance.client;
 
 class WaffleGoSellerApp extends StatelessWidget {
   const WaffleGoSellerApp({super.key});
@@ -16,18 +29,7 @@ class WaffleGoSellerApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         fontFamily: 'Roboto',
       ),
-      home: SellerHomeScreen(
-        currentUser: User(
-          username: 'admin',
-          password: 'password123',
-          fullName: 'Admin User',
-          role: 'owner',
-        ),
-        isShopOpen: true,
-        onToggleShopStatus: () {
-          print("Shop status toggled");
-        },
-      ),
+      home: const LoginScreen(),
     );
   }
 }

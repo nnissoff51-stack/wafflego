@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'screens/buyer/main_shell.dart';
-=======
 import 'package:provider/provider.dart';
-import 'main_shell.dart';
->>>>>>> 068fc073bead1b7281b6306d3cc67a9f0893d023
+import 'package:wafflego/screens/buyer/main_shell.dart';
+
 
 void main() => runApp(const WaffleApp());
 

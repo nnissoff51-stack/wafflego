@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/user.dart';
 
 class SellerDashboardOne extends StatelessWidget {
-  final User currentUser;
+  final UserModel currentUser;
   final bool isShopOpen;
 
   const SellerDashboardOne({

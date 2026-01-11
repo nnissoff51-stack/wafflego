@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/user.dart';
 
 class SellerDashboardTwo extends StatelessWidget {
-  final User currentUser;
+  final UserModel currentUser;
   final bool isShopOpen;
 
   const SellerDashboardTwo({
@@ -59,7 +59,7 @@ class SellerDashboardTwo extends StatelessWidget {
         children: [
           Row(children: [Icon(icon, color: Colors.orange, size: 20), const SizedBox(width: 8), Text(title, style: const TextStyle(fontWeight: FontWeight.bold))]),
           const SizedBox(height: 8),
-          ...items.map((item) => Text(item)).toList(),
+          ...items.map((item) => Text(item)),
         ],
       ),
     );

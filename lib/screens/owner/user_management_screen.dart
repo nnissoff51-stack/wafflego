@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../models/user.dart';
-import '../../database/database_helper.dart';
+import '../../database/supabase_helper.dart';
 
 class UserManagementScreen extends StatefulWidget {
-  final User currentUser;
+  final UserModel currentUser;
 
   const UserManagementScreen({
     super.key,
@@ -15,7 +15,7 @@ class UserManagementScreen extends StatefulWidget {
 }
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
-  List<User> _staff = [];
+  List<UserModel> _staff = [];
   bool _isLoading = true;
 
   @override
@@ -27,7 +27,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Future<void> _loadStaff() async {
     setState(() => _isLoading = true);
     try {
-      final staff = await DatabaseHelper.instance.getAllStaff();
+      final staff = await SupabaseHelper.instance.getAllStaff();
       setState(() {
         _staff = staff;
         _isLoading = false;
@@ -53,20 +53,21 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     if (result != null) {
       try {
         // Check if username already exists
-        final exists = await DatabaseHelper.instance.usernameExists(result['username']!);
+        final exists = await SupabaseHelper.instance.usernameExists(result['username']!);
         if (exists) {
           _showSnackBar('Username already exists!');
           return;
         }
 
-        final newUser = User(
+        final newUser = UserModel(
           username: result['username']!,
           password: result['password']!,
           fullName: result['fullName']!,
+          email: '${result['username']!}@wafflego.com',
           role: 'staff',
         );
 
-        await DatabaseHelper.instance.addUser(newUser);
+        await SupabaseHelper.instance.addUser(newUser);
         _showSnackBar('Staff added successfully!');
         _loadStaff();
       } catch (e) {
@@ -75,7 +76,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     }
   }
 
-  Future<void> _editStaff(User staff) async {
+  Future<void> _editStaff(UserModel staff) async {
     final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (context) => _AddEditStaffDialog(user: staff),
@@ -89,7 +90,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
           fullName: result['fullName'],
         );
 
-        await DatabaseHelper.instance.updateUser(updatedUser);
+        await SupabaseHelper.instance.updateUser(updatedUser);
         _showSnackBar('Staff updated successfully!');
         _loadStaff();
       } catch (e) {
@@ -98,7 +99,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     }
   }
 
-  Future<void> _deleteStaff(User staff) async {
+  Future<void> _deleteStaff(UserModel staff) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -120,7 +121,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
     if (confirm == true) {
       try {
-        await DatabaseHelper.instance.deleteUser(staff.id!);
+        await SupabaseHelper.instance.deleteUser(staff.id!);
         _showSnackBar('Staff deleted successfully!');
         _loadStaff();
       } catch (e) {
@@ -251,7 +252,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     );
   }
 
-  Widget _buildStaffCard(User staff) {
+  Widget _buildStaffCard(UserModel staff) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -347,7 +348,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
 // Add/Edit Dialog
 class _AddEditStaffDialog extends StatefulWidget {
-  final User? user;
+  final UserModel? user;
 
   const _AddEditStaffDialog({this.user});
 

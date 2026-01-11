@@ -1,63 +1,69 @@
-class User {
-  final int? id;
+class UserModel {
+  final String? id; // UUID from Supabase
   final String username;
   final String password;
   final String fullName;
+  final String email;
   final String role; // 'owner' or 'staff'
   final DateTime createdAt;
   final bool isActive;
 
-  User({
+  UserModel({
     this.id,
     required this.username,
     required this.password,
     required this.fullName,
+    required this.email,
     required this.role,
     DateTime? createdAt,
     this.isActive = true,
   }) : createdAt = createdAt ?? DateTime.now();
 
-  // Convert User to Map for database storage
+  // Convert UserModel to Map for Supabase
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      if (id != null) 'id': id,
       'username': username,
       'password': password,
-      'fullName': fullName,
+      'full_name': fullName,
+      'email': email,
       'role': role,
-      'createdAt': createdAt.toIso8601String(),
-      'isActive': isActive ? 1 : 0,
+      'created_at': createdAt.toIso8601String(),
+      'is_active': isActive,
     };
   }
 
-  // Create User from Map (database query result)
-  factory User.fromMap(Map<String, dynamic> map) {
-    return User(
+  // Create UserModel from Map (Supabase query result)
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
       id: map['id'],
       username: map['username'],
       password: map['password'],
-      fullName: map['fullName'],
+      fullName: map['full_name'],
+      email: map['email'],
       role: map['role'],
-      createdAt: DateTime.parse(map['createdAt']),
-      isActive: map['isActive'] == 1,
+      createdAt: DateTime.parse(map['created_at']),
+      isActive: map['is_active'] ?? true,
     );
   }
 
   // Copy with method for updates
-  User copyWith({
-    int? id,
+  UserModel copyWith({
+    String? id,
     String? username,
     String? password,
     String? fullName,
+    String? email,
     String? role,
     DateTime? createdAt,
     bool? isActive,
   }) {
-    return User(
+    return UserModel(
       id: id ?? this.id,
       username: username ?? this.username,
       password: password ?? this.password,
       fullName: fullName ?? this.fullName,
+      email: email ?? this.email,
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
       isActive: isActive ?? this.isActive,

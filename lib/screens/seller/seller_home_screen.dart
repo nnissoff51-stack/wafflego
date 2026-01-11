@@ -4,7 +4,7 @@ import 'seller_dashboard_one.dart';
 import 'seller_dashboard_two.dart';
 
 class SellerHomeScreen extends StatefulWidget {
-  final User currentUser;
+  final UserModel currentUser;
   final bool isShopOpen;
   final VoidCallback onToggleShopStatus;
 

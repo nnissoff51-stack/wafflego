@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/user.dart';
 
 class SellerStockScreen extends StatefulWidget {
-  final User currentUser;
+  final UserModel currentUser;
   final bool isShopOpen;
   final VoidCallback onToggleShopStatus;
 

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:wafflego/database/supabase_helper.dart';
+import 'package:wafflego/screens/seller/login_screen.dart';
 import '../../models/user.dart';
-import '../../database/database_helper.dart';
-import '../login_screen.dart';
 
 class OwnerProfileScreen extends StatefulWidget {
-  final User currentUser;
-
+  final UserModel currentUser;
   const OwnerProfileScreen({
     super.key,
     required this.currentUser,
@@ -266,7 +265,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           password: result['newPassword'],
         );
 
-        await DatabaseHelper.instance.updateUser(updatedUser);
+        await SupabaseHelper.instance.updateUser(updatedUser);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -296,7 +295,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           fullName: result['fullName'],
         );
 
-        await DatabaseHelper.instance.updateUser(updatedUser);
+        await SupabaseHelper.instance.updateUser(updatedUser);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -495,7 +494,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
 
 // Update Profile Dialog
 class _UpdateProfileDialog extends StatefulWidget {
-  final User user;
+  final UserModel user;
 
   const _UpdateProfileDialog({required this.user});
 
