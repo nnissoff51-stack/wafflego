@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
-import 'dashboard_one.dart';
-import 'dashboard_two.dart';
+import '../../models/user.dart';
+import 'seller_dashboard_one.dart';
+import 'seller_dashboard_two.dart';
 
-class HomeScreen extends StatefulWidget {
+class SellerHomeScreen extends StatefulWidget {
+  final User currentUser;
   final bool isShopOpen;
   final VoidCallback onToggleShopStatus;
 
-  const HomeScreen({
+  const SellerHomeScreen({
     super.key,
+    required this.currentUser,
     required this.isShopOpen,
     required this.onToggleShopStatus,
   });
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<SellerHomeScreen> createState() => _SellerHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _SellerHomeScreenState extends State<SellerHomeScreen> {
   int _selectedTab = 0; // 0 for Today Sales, 1 for Weekly Sales
 
   @override
@@ -50,9 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 12),
                   const Text('Welcome, ', style: TextStyle(fontSize: 16)),
-                  const Text(
-                    'Ali!',
-                    style: TextStyle(
+                  Text(
+                    '${widget.currentUser.fullName.split(' ')[0]}!',
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Color(0xFFFF6B6B),
                       fontWeight: FontWeight.w500,
@@ -107,8 +110,14 @@ class _HomeScreenState extends State<HomeScreen> {
             // Dynamic Dashboard Content
             Expanded(
               child: _selectedTab == 0
-                  ? DashboardOneContent(isShopOpen: widget.isShopOpen)
-                  : DashboardTwoContent(isShopOpen: widget.isShopOpen),
+                  ? SellerDashboardOne(
+                      currentUser: widget.currentUser,
+                      isShopOpen: widget.isShopOpen,
+                    )
+                  : SellerDashboardTwo(
+                      currentUser: widget.currentUser,
+                      isShopOpen: widget.isShopOpen,
+                    ),
             ),
           ],
         ),

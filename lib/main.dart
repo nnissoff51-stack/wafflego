@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main_shell.dart';
+import 'screens/buyer/main_shell.dart';
 
 void main() => runApp(const WaffleApp());
 

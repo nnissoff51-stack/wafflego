@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
+import '../../models/user.dart';
 
-class StockScreen extends StatefulWidget {
+class SellerStockScreen extends StatefulWidget {
+  final User currentUser;
   final bool isShopOpen;
   final VoidCallback onToggleShopStatus;
 
-  const StockScreen({
+  const SellerStockScreen({
     super.key,
+    required this.currentUser,
     required this.isShopOpen,
     required this.onToggleShopStatus,
   });
 
   @override
-  State<StockScreen> createState() => _StockScreenState();
+  State<SellerStockScreen> createState() => _SellerStockScreenState();
 }
 
-class _StockScreenState extends State<StockScreen> {
-  // 1. Logo Configuration following your data style
-  final Map<String, dynamic> logoConfig = {
-    "name": "WaffleGo Logo",
-    "image": "assets/images/wafflego_logo.png",
-  };
-
+class _SellerStockScreenState extends State<SellerStockScreen> {
   late Map<String, bool> availabilityMap;
 
-  // 2. Waffle Data List
+  // Waffle Data List
   final List<Map<String, dynamic>> waffles = [
     {
       "name": "Chocolate",
@@ -82,13 +79,13 @@ class _StockScreenState extends State<StockScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Updated Header with Dynamic Logo
+            // Header
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
                   Image.asset(
-                    logoConfig['image'],
+                    'assets/images/wafflego_logo.png',
                     width: 50,
                     height: 50,
                     fit: BoxFit.contain,
@@ -104,9 +101,9 @@ class _StockScreenState extends State<StockScreen> {
                   ),
                   const SizedBox(width: 12),
                   const Text('Welcome, ', style: TextStyle(fontSize: 16)),
-                  const Text(
-                    'Ali!',
-                    style: TextStyle(
+                  Text(
+                    '${widget.currentUser.fullName.split(' ')[0]}!',
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Color(0xFFFF6B6B),
                       fontWeight: FontWeight.bold,
@@ -245,7 +242,6 @@ class _StockScreenState extends State<StockScreen> {
     );
   }
 
-  // UI Helpers
   Widget _buildHeaderIcon(IconData icon, {bool isProfile = false}) {
     return Container(
       padding: const EdgeInsets.all(8),

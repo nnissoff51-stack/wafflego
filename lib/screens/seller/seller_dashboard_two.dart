@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../models/user.dart';
 
-class DashboardTwoContent extends StatelessWidget {
+class SellerDashboardTwo extends StatelessWidget {
+  final User currentUser;
   final bool isShopOpen;
 
-  const DashboardTwoContent({super.key, required this.isShopOpen});
+  const SellerDashboardTwo({
+    super.key,
+    required this.currentUser,
+    required this.isShopOpen,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +59,7 @@ class DashboardTwoContent extends StatelessWidget {
         children: [
           Row(children: [Icon(icon, color: Colors.orange, size: 20), const SizedBox(width: 8), Text(title, style: const TextStyle(fontWeight: FontWeight.bold))]),
           const SizedBox(height: 8),
-          ...items.map((item) => Text(item)),
+          ...items.map((item) => Text(item)).toList(),
         ],
       ),
     );

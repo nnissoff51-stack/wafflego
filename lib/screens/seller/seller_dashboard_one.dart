@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../models/user.dart';
 
-class DashboardOneContent extends StatelessWidget {
+class SellerDashboardOne extends StatelessWidget {
+  final User currentUser;
   final bool isShopOpen;
 
-  const DashboardOneContent({super.key, required this.isShopOpen});
+  const SellerDashboardOne({
+    super.key,
+    required this.currentUser,
+    required this.isShopOpen,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +37,7 @@ class DashboardOneContent extends StatelessWidget {
                 const SizedBox(height: 20),
                 _buildInfoRow('Date:', '12/12/2025'),
                 const SizedBox(height: 12),
-                _buildInChargeRow(['Alin', 'Ali']),
+                _buildInChargeRow([currentUser.fullName]),
               ],
             ),
           ),
