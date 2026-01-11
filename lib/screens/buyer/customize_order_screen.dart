@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 
-class _UnitConfig {
-  final Set<String> toppings = {};
-  String? mix;
-}
-
 class CustomizeOrderScreen extends StatefulWidget {
   final Map<String, dynamic> item;
 
@@ -14,17 +9,33 @@ class CustomizeOrderScreen extends StatefulWidget {
   State<CustomizeOrderScreen> createState() => _CustomizeOrderScreenState();
 }
 
+// =====================
+// Per-unit config
+// =====================
+class _UnitConfig {
+  final Set<String> toppings = {};
+  String? mix;
+}
+
 class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
   int qty = 1;
 
-  // options
-  final List<String> toppings = const ["Oreo Crumbs", "Honey Drizzle"];
-  final List<String> mixWith = const ["Butter", "Kaya", "Peanut", "Strawberry", "Chocolate"];
+  final List<String> toppings = const [
+    "Oreo Crumbs",
+    "Honey Drizzle",
+  ];
 
-  // per-item config
+  final List<String> mixWith = const [
+    "Butter",
+    "Kaya",
+    "Peanut",
+    "Strawberry",
+    "Chocolate",
+  ];
+
   final List<_UnitConfig> units = [_UnitConfig()];
 
-  double get basePrice => (widget.item["price"] as num).toDouble();
+  double get basePrice => (widget.item['price'] as num).toDouble();
   double unitTotal(_UnitConfig u) => basePrice + (u.toppings.length * 0.50);
   double get total => units.fold(0.0, (sum, u) => sum + unitTotal(u));
 
@@ -43,9 +54,9 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.item["name"] as String;
-    final desc = widget.item["desc"] as String;
-    final image = widget.item["image"] as String;
+    final String name = widget.item['name'];
+    final String desc = widget.item['desc'];
+    final String image = widget.item['image'];
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF5E8),
@@ -61,7 +72,9 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // ✅ scroll area
+            // =====================
+            // SCROLL AREA
+            // =====================
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -75,9 +88,12 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                       fit: BoxFit.cover,
                     ),
                   ),
+
                   const SizedBox(height: 14),
 
+                  // =====================
                   // PRODUCT CARD
+                  // =====================
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -87,7 +103,6 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Name + Price
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -109,6 +124,7 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                             ),
                           ],
                         ),
+
                         const SizedBox(height: 6),
 
                         Text(
@@ -116,12 +132,14 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                           style: const TextStyle(
                             fontSize: 13,
                             color: Colors.black54,
-                            height: 1.25,
                           ),
                         ),
+
                         const SizedBox(height: 10),
 
-                        // QTY
+                        // =====================
+                        // QTY CONTROL
+                        // =====================
                         Align(
                           alignment: Alignment.centerRight,
                           child: Row(
@@ -155,7 +173,9 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
 
                   const SizedBox(height: 14),
 
-                  // ✅ PER-ITEM customization (dalam scroll)
+                  // =====================
+                  // PER ITEM CUSTOMIZATION
+                  // =====================
                   for (int i = 0; i < units.length; i++) ...[
                     Container(
                       padding: const EdgeInsets.all(14),
@@ -168,8 +188,12 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                         children: [
                           Text(
                             "Item ${i + 1}",
-                            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
+
                           const SizedBox(height: 10),
 
                           _SectionCard(
@@ -184,8 +208,10 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                                     selected: units[i].toppings.contains(t),
                                     onTap: () {
                                       setState(() {
-                                        if (!units[i].toppings.add(t)) {
+                                        if (units[i].toppings.contains(t)) {
                                           units[i].toppings.remove(t);
+                                        } else {
+                                          units[i].toppings.add(t);
                                         }
                                       });
                                     },
@@ -193,6 +219,7 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                               ],
                             ),
                           ),
+
                           const SizedBox(height: 12),
 
                           _SectionCard(
@@ -207,7 +234,8 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                                     selected: units[i].mix == m,
                                     onTap: () {
                                       setState(() {
-                                        units[i].mix = (units[i].mix == m) ? null : m;
+                                        units[i].mix =
+                                            (units[i].mix == m) ? null : m;
                                       });
                                     },
                                   ),
@@ -221,7 +249,9 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                             alignment: Alignment.centerRight,
                             child: Text(
                               "Subtotal: RM${unitTotal(units[i]).toStringAsFixed(2)}",
-                              style: const TextStyle(fontWeight: FontWeight.w900),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                         ],
@@ -233,7 +263,9 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
               ),
             ),
 
-            // ✅ fixed bottom bar (tak lari)
+            // =====================
+            // FIXED BOTTOM BAR
+            // =====================
             Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               decoration: const BoxDecoration(color: Colors.white),
@@ -242,7 +274,8 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Total", style: TextStyle(color: Colors.black54)),
+                      const Text("Total",
+                          style: TextStyle(color: Colors.black54)),
                       const SizedBox(height: 4),
                       Text(
                         "RM${total.toStringAsFixed(2)}",
@@ -258,13 +291,11 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                     height: 48,
                     child: ElevatedButton(
                       onPressed: () {
-                        final summary = [
-                          for (int i = 0; i < units.length; i++)
-                            "Item ${i + 1}: topping = ${units[i].toppings.isEmpty ? "-" : units[i].toppings.join(", ")} mix = ${units[i].mix ?? "-"}"
-                        ].join(" | ");
-
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Added $qty item(s) • $summary")),
+                          SnackBar(
+                            content:
+                                Text("Added $qty item(s) to cart"),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -273,7 +304,6 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
                       ),
                       child: const Text(
                         "Add Order",
@@ -292,7 +322,7 @@ class _CustomizeOrderScreenState extends State<CustomizeOrderScreen> {
 }
 
 // =====================
-// Small widgets
+// SMALL WIDGETS
 // =====================
 
 class _QtyButton extends StatelessWidget {
@@ -310,7 +340,9 @@ class _QtyButton extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: onTap == null ? Colors.black12 : const Color(0xFFFFE2B8),
+          color: onTap == null
+              ? Colors.black12
+              : const Color(0xFFFFE2B8),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, size: 18),
@@ -337,7 +369,8 @@ class _SectionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
+          Text(title,
+              style: const TextStyle(fontWeight: FontWeight.w900)),
           const SizedBox(height: 10),
           child,
         ],
@@ -363,17 +396,22 @@ class _TagChip extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(999),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? Colors.orange : Colors.transparent,
+          color: selected
+              ? const Color(0xFFFFC36D)
+              : const Color(0xFFFFEFD8),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: Colors.orange),
+          border: Border.all(
+            color: selected ? Colors.orange : Colors.black12,
+          ),
         ),
         child: Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w800,
-            color: selected ? Colors.white : Colors.orange,
+            fontSize: 12,
           ),
         ),
       ),

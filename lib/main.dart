@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'screens/buyer/main_shell.dart';
+=======
+import 'package:provider/provider.dart';
+import 'main_shell.dart';
+>>>>>>> 068fc073bead1b7281b6306d3cc67a9f0893d023
 
 void main() => runApp(const WaffleApp());
 
@@ -7,8 +12,13 @@ class WaffleApp extends StatelessWidget {
   const WaffleApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+ @override
+Widget build(BuildContext context) {
+  return MultiProvider(
+    providers: [
+      // Add your providers here
+    ],
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Waffle Go',
       theme: ThemeData(
@@ -16,9 +26,13 @@ class WaffleApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MainShell(),
-    );
-  }
+    ),
+  );
 }
+
+}
+
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -105,3 +119,17 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Waffle Order App',
+    );
+  }
+}
+
+
