@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'screens/buyer/main_shell.dart';
 import 'package:provider/provider.dart';
+<<<<<<< ours
+=======
+import 'main_shell.dart';
+import 'providers/order_store.dart';
+>>>>>>> theirs
 
 void main() => runApp(const WaffleApp());
 
@@ -11,7 +16,7 @@ class WaffleApp extends StatelessWidget {
 Widget build(BuildContext context) {
   return MultiProvider(
     providers: [
-      // Add your providers here
+      ChangeNotifierProvider(create: (_) => OrderStore()),
     ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
