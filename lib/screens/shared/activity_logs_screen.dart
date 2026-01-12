@@ -1,79 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 import '../../models/user.dart';
-import 'choose_screen.dart'; // Import skrin mula
 
 class ActivityLogsScreen extends StatefulWidget {
   final UserModel currentUser;
-
-  const ActivityLogsScreen({
-    super.key,
-    required this.currentUser,
-  });
+  const ActivityLogsScreen({super.key, required this.currentUser});
 
   @override
   State<ActivityLogsScreen> createState() => _ActivityLogsScreenState();
 }
 
 class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
-  
-  // Fungsi Logout
-  void _logout(BuildContext context) {
-    // Navigator ni akan buang semua skrin lama dan balik ke ChooseScreen
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const ChooseScreen()),
-      (route) => false, // Ini yang buat user tak boleh tekan 'Back' masuk balik
-    );
+  final supabase = Supabase.instance.client;
+  bool _isLoading = true;
+  List<dynamic> _logs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLogs();
+  }
+
+  Future<void> _fetchLogs() async {
+    setState(() => _isLoading = true);
+    try {
+      final data = await supabase
+          .from('activity_logs')
+          .select()
+          .order('created_at', ascending: false);
+
+      setState(() {
+        _logs = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint("Error: $e");
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF3CC),
       appBar: AppBar(
-        title: const Text('Activity Logs'),
-        backgroundColor: widget.currentUser.role == 'owner' 
-            ? const Color(0xFF8B4513) 
-            : const Color(0xFFFF8C00),
-        foregroundColor: Colors.white,
-        actions: [
-          // Butang Logout kat hujung App Bar
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _showLogoutDialog(context),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Logged in as: ${widget.currentUser.fullName}'),
-            const SizedBox(height: 20),
-            const Text('Activity history will appear here.'),
-          ],
+        title: const Text("System Logs", style: TextStyle(color: Colors.brown, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.brown),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-    );
-  }
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _fetchLogs,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(15),
+                itemCount: _logs.length,
+                itemBuilder: (context, index) {
+                  final log = _logs[index];
+                  final DateTime date = DateTime.parse(log['created_at']).toLocal();
+                  final String formattedDate = DateFormat('dd MMM, hh:mm a').format(date);
 
-  // Dialog pengesahan sebelum logout
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => _logout(context),
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+                  return Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: log['role'] == 'owner' ? Colors.blue : Colors.orange,
+                        child: Icon(
+                          log['action'].toString().contains('DELETE') ? Icons.warning : Icons.info,
+                          color: Colors.white, size: 18,
+                        ),
+                      ),
+                      title: Text("${log['user_name']} - ${log['action']}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("${log['details']}", style: const TextStyle(fontSize: 13)),
+                          Text(formattedDate, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
     );
   }
 }

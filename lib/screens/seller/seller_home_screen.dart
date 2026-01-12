@@ -29,20 +29,14 @@ class SellerHomeScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Hello, ${currentUser.fullName}!", 
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      Text("Hello, ${currentUser.fullName}!", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                       const Text("Let's sell some waffles!"),
                     ],
                   ),
-                  const CircleAvatar(
-                    backgroundColor: Colors.orange, 
-                    child: Icon(Icons.person, color: Colors.white)
-                  ),
+                  const CircleAvatar(backgroundColor: Colors.orange, child: Icon(Icons.person, color: Colors.white)),
                 ],
               ),
               const SizedBox(height: 25),
-
-              // Consistent Shop Status Card (English)
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -51,22 +45,19 @@ class SellerHomeScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(isShopOpen ? Icons.store : Icons.store_mall_directory, 
-                         color: isShopOpen ? Colors.green : Colors.red, size: 40),
+                    Icon(isShopOpen ? Icons.store : Icons.store_mall_directory, color: isShopOpen ? Colors.green : Colors.red, size: 40),
                     const SizedBox(width: 15),
                     Expanded(
                       child: Text(
                         isShopOpen ? "SHOP STATUS: OPEN" : "SHOP STATUS: CLOSED",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold, 
-                          color: isShopOpen ? Colors.green.shade900 : Colors.red.shade900
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: isShopOpen ? Colors.green.shade900 : Colors.red.shade900),
                       ),
                     ),
                     Switch(
                       value: isShopOpen, 
-                      onChanged: (_) => onToggleShopStatus(),
-                      activeColor: Colors.green,
+                      // CUMA OWNER BOLEH TEKAN
+                      onChanged: currentUser.role == 'Owner' ? (_) => onToggleShopStatus() : null,
+                      activeThumbColor: Colors.green,
                     ),
                   ],
                 ),

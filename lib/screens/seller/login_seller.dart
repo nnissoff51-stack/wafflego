@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Tambah ni
 import '../../models/user.dart';
-// Import controller ikut folder dalam screenshot kau
 import '../owner/owner_main_controller.dart';
 import '../seller/seller_main_controller.dart';
 
@@ -17,6 +17,7 @@ class _LoginSellerScreenState extends State<LoginSellerScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isSubmitting = false; // Untuk loading state
 
   LoginRole _selectedRole = LoginRole.owner;
 
@@ -27,39 +28,67 @@ class _LoginSellerScreenState extends State<LoginSellerScreen> {
     super.dispose();
   }
 
-  void _login() {
+  // --- LOGIC SUPABASE START ---
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      // Tentukan role dalam string
-      final role = _selectedRole == LoginRole.owner ? 'owner' : 'staff';
+      setState(() => _isSubmitting = true);
+      final supabase = Supabase.instance.client;
+      final selectedRoleStr = _selectedRole == LoginRole.owner ? 'owner' : 'staff';
 
-      final user = UserModel(
-        username: _usernameController.text.trim(),
-        password: _passwordController.text,
-        fullName: _usernameController.text.trim(),
-        email: '${_usernameController.text.trim()}@wafflego.com',
-        role: role,
-      );
+      try {
+        // 1. Cari user yang match Username, Password, DAN Role
+        final response = await supabase
+            .from('users')
+            .select()
+            .eq('username', _usernameController.text.trim())
+            .eq('password', _passwordController.text)
+            .eq('role', selectedRoleStr)
+            .maybeSingle();
 
-      // --- LOGIC INTEGRASI IKUT ROLE ---
-      if (_selectedRole == LoginRole.owner) {
-        // Hantar ke folder owner
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => OwnerMainController(currentUser: user),
-          ),
+        if (response != null) {
+          final user = UserModel.fromMap(response);
+
+          // 2. Simpan Activity Log Login
+          await supabase.from('activity_logs').insert({
+            'user_id': user.id,
+            'user_name': user.fullName,
+            'role': user.role,
+            'action': 'LOGIN',
+            'details': '${user.fullName} logged into the system',
+          });
+
+          if (!mounted) return;
+
+          // 3. Navigate ikut role
+          if (user.role == 'owner') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => OwnerMainController(currentUser: user)),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => SellerMainController(currentUser: user)),
+            );
+          }
+        } else {
+          // Jika data tak jumpa
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Invalid $selectedRoleStr credentials")),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Connection Error: $e")),
         );
-      } else {
-        // Hantar ke folder seller
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => SellerMainController(currentUser: user),
-          ),
-        );
+      } finally {
+        if (mounted) setState(() => _isSubmitting = false);
       }
     }
   }
+  // --- LOGIC SUPABASE END ---
 
   @override
   Widget build(BuildContext context) {
@@ -107,13 +136,15 @@ class _LoginSellerScreenState extends State<LoginSellerScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: _isSubmitting ? null : _login, // Disable masa loading
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
-                  child: const Text('Login', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: _isSubmitting 
+                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Text('Login', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(height: 40),
